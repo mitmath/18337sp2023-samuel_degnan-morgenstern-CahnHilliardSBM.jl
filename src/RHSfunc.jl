@@ -1,3 +1,8 @@
+module RHSfunc
+
+export CHCacheFuncCPU,CHCacheFuncGPU
+
+using PreallocationTools,LinearAlgebra,CUDA
 struct CHCacheFuncCPU{T} <: Function
     ψ::T # Mask Object
     ∇ψ_x::T # Precomputed dψ/dx matrix
@@ -87,4 +92,6 @@ function (ff:CHCacheFuncGPU)(du,u,p,t)
     mul!(∇μ_y,μ,∇y) # Compute (∇μ)_y = μ*∇y
     @. dc = D*(c*(1f0-c)*((∇ψ_x*∇μ_x + ∇ψ_y*∇μ_y)./ψ + ∇2μ) + (1f0 - 2f0*c)*(∇c_x*∇μ_x + ∇c_y*∇μ_y))
     return nothing
+end
+
 end

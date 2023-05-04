@@ -1,25 +1,5 @@
 # Parameter Setup
-struct CHsetup
-    # Domain Parameters
-    ψ
-    # Stencils 
-    ∇x # d/dx stencil
-    ∇y # d/dy stencil
-    ∇2x # d^2/dx^2 stencil
-    ∇2y # d^2/dy^2 stencil
-    # Precomputed vars
-    ∇ψ_x # Precomputed dψ/dx matrix
-    ∇ψ_y # Precomputed dψ/dy matrix
-    # Caches:
-    ∇c_x # storage for dc/dx
-    ∇c_y # storage for dc/dy
-    ∇2c # storage for ∇²c
-    μ # storage for μ
-    ∇2μ # storage for ∇²μ
-    ∇μ_x # storage for dμ/dx
-    ∇μ_y # storage for dμ/dy
-end
-function init_param(ψ; gpuflag = false,kw...)
+function setup_CH(ψ; gpuflag = false,kw...)
     #Set up the simulation domain from the mask
     Nx, Ny = size(ψ) # grab size
     x = LinRange(0.0, 1, Nx) # x domain
@@ -57,14 +37,14 @@ function init_param(ψ; gpuflag = false,kw...)
 
     if ~gpuflag
         # Set up the caches
-        ∇c_x=zeros(Nx,Ny); ∇c_x_c = DiffCache(∇c_x);
-        ∇c_y=zeros(Nx,Ny); ∇c_y_c = DiffCache(∇c_y);
-        ∇2c=zeros(Nx,Ny); ∇2c_c = DiffCache(∇2c)
-        μ = zeros(Nx,Ny); μ_c = DiffCache(μ)
-        ∇2μ=zeros(Nx,Ny); ∇2μ_c = DiffCache(∇2μ)
-        ∇μ_x=zeros(Nx,Ny); ∇μ_x_c = DiffCache(∇μ_x)
-        ∇μ_y=zeros(Nx,Ny); ∇μ_y_c = DiffCache(∇μ_y)
-        return x,y,CHsetup(ψ,∇x,∇y,∇2x,∇2y,∇ψ_x,∇ψ_y,∇c_x_c,∇c_y_c,∇2c_c,μ_c,∇2μ_c,∇μ_x_c,∇μ_y_c)
+        ∇c_x=zeros(Nx,Ny); ∇c_x_c = DiffCache(∇c_x ;kw...);
+        ∇c_y=zeros(Nx,Ny); ∇c_y_c = DiffCache(∇c_y ;kw...);
+        ∇2c=zeros(Nx,Ny); ∇2c_c = DiffCache(∇2c ;kw...)
+        μ = zeros(Nx,Ny); μ_c = DiffCache(μ ;kw...)
+        ∇2μ=zeros(Nx,Ny); ∇2μ_c = DiffCache(∇2μ ;kw...)
+        ∇μ_x=zeros(Nx,Ny); ∇μ_x_c = DiffCache(∇μ_x ;kw...)
+        ∇μ_y=zeros(Nx,Ny); ∇μ_y_c = DiffCache(∇μ_y ;kw...)
+        return x,y,CHCacheFuncCPU(ψ,∇x,∇y,∇2x,∇2y,∇ψ_x,∇ψ_y,∇c_x_c,∇c_y_c,∇2c_c,μ_c,∇2μ_c,∇μ_x_c,∇μ_y_c)
     else
         # Convert everything to Float32 and send to the gpu
         ψ_g = CuArray(Float32.(ψ))
@@ -81,7 +61,7 @@ function init_param(ψ; gpuflag = false,kw...)
         ∇2μ_g = CuArray(Float32.(∇2μ))
         ∇μ_x_g = CuArray(Float32.(∇μ_x))
         ∇μ_y_g = CuArray(Float32.(∇μ_y))
-        return x,y,CHsetup(ψ_g,∇x_g,∇y_g,∇2x_g,∇2y_g,∇ψ_x_g,∇ψ_y_g,∇c_x_g,∇c_y_g,∇2c_g,μ_g,∇2μ_g,∇μ_x_g,∇μ_y_g)
+        return x,y,CHCacheFuncGPU(ψ_g,∇x_g,∇y_g,∇2x_g,∇2y_g,∇ψ_x_g,∇ψ_y_g,∇c_x_g,∇c_y_g,∇2c_g,μ_g,∇2μ_g,∇μ_x_g,∇μ_y_g)
     end
 
 end

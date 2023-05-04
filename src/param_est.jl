@@ -1,0 +1,6 @@
+module param_est
+using DifferentialEquations,Optimization,ForwardDiff,PreallocationTools,Optim,OptimizationOptimJL,LinearAlgebra,SciMLSensitivity
+import runsim,rhsfunc,utils
+export setup_pe,solve_pe
+
+end

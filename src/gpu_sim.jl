@@ -1,8 +1,9 @@
 module gpu_sim
-import RHSfunc,utils
+
 
 export SimTokenGPU,runsimGPU
 
+using .utils:setup_CH,makesparseprob,CHsol
 using DifferentialEquations,CUDA
 
 struct SimTokenGPU

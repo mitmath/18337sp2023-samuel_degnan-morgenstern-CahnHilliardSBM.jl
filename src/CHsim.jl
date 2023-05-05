@@ -1,5 +1,6 @@
 module CHsim
-import RHSfunc,utils
+
+using .utils:setup_CH,makesparseprob,CHsol
 
 export SimToken,runsim
 

@@ -1,7 +1,4 @@
-module param_est
-using DifferentialEquations,Optimization,ForwardDiff,PreallocationTools,Optim,OptimizationOptimJL,LinearAlgebra,SciMLSensitivity
-using .Utils:setup_CH,makesparseprob,CHsol
-export run_pe
+#include("Utils.jl")
 function proto_loss(θ,prob,tsteps,ode_data,ψ_binary)
     tmp_prob = remake(prob, p = θ)
     tmp_sol = solve(tmp_prob, TRBDF2(), saveat =tsteps,sensealg =ForwardDiffSensitivity())
@@ -37,11 +34,9 @@ function solve_pe(pinit,loss;iter_max=200)
 end
 
 
-function run_pe(ψ,ψ_binary,c0_messy,ptruth;tspan=(0.0,1.0),Nsteps=100,itmax=200;)
+function run_pe(ψ,ψ_binary,c0_messy,ptruth;tspan=(0.0,1.0),Nsteps=100,itmax=200)
     tsteps,ode_data,prob=set_pe(ψ,c0_messy,ptruth,tspan,Nsteps)
     loss(θ) = proto_loss(θ,prob,tsteps,ode_data,ψ_binary)
     optsol=solve_pe(pinit,loss;iter_max=itmax)
     return optsol
-end
-
 end

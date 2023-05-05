@@ -1,11 +1,4 @@
 # Parameter Setup
-module utils
-
-using .RHSFunc: CHCacheFuncCPU,CHCacheFuncGPU
-export setup_CH,makesparseprob,makegif
-
-using Symbolics,SparseDiffTools,SparseArrays,LinearAlgebra,CUDA,PreallocationTools,Plots,DifferentialEquations
-
 function setup_CH(ψ; gpuflag = false,kw...)
     #Set up the simulation domain from the mask
     Nx, Ny = size(ψ) # grab size
@@ -96,6 +89,4 @@ function makegif(fullsol::CHsol; fpsv=10)
     masksol = Array(fullsol.sol).*fullsol.ψ_binary;
     anim = makegif(masksol)
     return gif(anim, fps = fpsv)
-end
-
 end

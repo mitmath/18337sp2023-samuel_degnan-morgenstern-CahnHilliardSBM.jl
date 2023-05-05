@@ -1,11 +1,4 @@
-module gpu_sim
-
-
-export SimTokenGPU,runsimGPU
-
-using .Utils:setup_CH,makesparseprob,CHsol
-using DifferentialEquations,CUDA
-
+#include("Utils.jl")
 struct SimTokenGPU
     ψ
     ψ_binary
@@ -25,6 +18,4 @@ function runsimGPU(simargs::SimTokenGPU;saveflag =false, kw...)
         sol = solve(prob,ROCK2(),save_everystep=false);
     end
     return CHsol(Array(sol),SimToken.ψ_binary)
-end
-
 end

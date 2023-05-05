@@ -1,11 +1,4 @@
-module CHsim
-
-using .Utils:setup_CH,makesparseprob,CHsol
-
-export SimToken,runsim
-
-using DifferentialEquations,Sundials
-
+#include("Utils.jl")
 struct SimTokenCPU
     ψ
     ψ_binary
@@ -25,6 +18,4 @@ function runsimCPU(simargs::SimTokenCPU;saveflag =false, kw...)
         sol = solve(prob,CVODE_BDF(linear_solver=:GMRES),save_everystep=false);
     end
     return CHsol(sol,SimToken.ψ_binary)
-end
-
 end

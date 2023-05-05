@@ -3,7 +3,7 @@ module gpu_sim
 
 export SimTokenGPU,runsimGPU
 
-using .utils:setup_CH,makesparseprob,CHsol
+using .Utils:setup_CH,makesparseprob,CHsol
 using DifferentialEquations,CUDA
 
 struct SimTokenGPU

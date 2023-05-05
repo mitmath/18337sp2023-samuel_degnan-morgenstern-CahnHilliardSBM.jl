@@ -1,7 +1,7 @@
 # Parameter Setup
 module utils
 
-using .RHSfunc: CHCacheFuncCPU,CHCacheFuncGPU
+using .RHSFunc: CHCacheFuncCPU,CHCacheFuncGPU
 export setup_CH,makesparseprob,makegif
 
 using Symbolics,SparseDiffTools,SparseArrays,LinearAlgebra,CUDA,PreallocationTools,Plots,DifferentialEquations

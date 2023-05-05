@@ -5,7 +5,7 @@ export SimToken,runsim
 
 using DifferentialEquations,Sundials
 
-struct SimToken
+struct SimTokenCPU
     ψ
     ψ_binary
     c0
@@ -14,7 +14,7 @@ struct SimToken
     p
     nt
 end
-function runsim(simargs::SimToken;saveflag =false, kw...)
+function runsimCPU(simargs::SimTokenCPU;saveflag =false, kw...)
     x,y,rhsfunc =setup_CH(ψ; gpuflag = false,kw...)
     tspan = (simargs.t0,simargs.tf);
     prob = makesparseprob(rhsfunc,simargs.c0,tspan,simargs.p)

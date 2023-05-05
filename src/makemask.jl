@@ -1,4 +1,3 @@
-using DelimitedFiles,Images,DifferentialEquations,Sundials
 @inline function lap_u(u,ix,iy,dx,dy,Nx,Ny)
     ## Laplacian Stencil for the ODE 
     left = ix > 1 ? u[ix-1,iy] : u[ix+1,iy]

@@ -1,6 +1,6 @@
 module param_est
 using DifferentialEquations,Optimization,ForwardDiff,PreallocationTools,Optim,OptimizationOptimJL,LinearAlgebra,SciMLSensitivity
-import runsim,rhsfunc,utils
+using .utils:setup_CH,makesparseprob,CHsol
 export run_pe
 function proto_loss(θ,prob,tsteps,ode_data,ψ_binary)
     tmp_prob = remake(prob, p = θ)

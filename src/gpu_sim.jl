@@ -1,11 +1,11 @@
 module gpu_sim
 import RHSfunc,utils
 
-export SimToken,runsim
+export SimTokenGPU,runsimGPU
 
-using DifferentialEquations,Sundials,CUDA
+using DifferentialEquations,CUDA
 
-struct SimToken
+struct SimTokenGPU
     ψ
     ψ_binary
     c0
@@ -14,7 +14,7 @@ struct SimToken
     p
     nt
 end
-function runsim(simargs::SimToken;saveflag =false, kw...)
+function runsimGPU(simargs::SimTokenGPU;saveflag =false, kw...)
     x,y,rhsfunc =setup_CH(ψ; gpuflag = true,kw...)
     tspan = (simargs.t0,simargs.tf);
     prob = makesparseprob(rhsfunc,simargs.c0,tspan,simargs.p)

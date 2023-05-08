@@ -11,6 +11,9 @@ script_dir = dirname(script_path)
 
 # Set the working directory to the script directory
 cd(script_dir)
+
+joinpath(@__DIR__, "relative", "path", "to", "\\masks")
+joinpath(@__DIR__, "relative", "path", "to", "\\initcond")
 ###############################################
 # CahnHilliardSBM.jl Set Up
 ###############################################
@@ -22,7 +25,7 @@ using Optimization,ForwardDiff,Optim,OptimizationOptimJL,SciMLSensitivity
 include("RHSFunc.jl")
 export CHCacheFuncCPU,CHCacheFuncGPU
 include("Utils.jl")
-export setup_CH,makesparseprob,makegif
+export setup_CH,makesparseprob,makegif,genC0
 include("CpuSim.jl")
 export SimTokenCPU,runsimCPU
 include("GpuSim.jl")

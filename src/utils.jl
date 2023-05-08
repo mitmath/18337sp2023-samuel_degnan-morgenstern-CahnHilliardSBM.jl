@@ -1,5 +1,5 @@
 # Parameter Setup
-function setup_CH(ψ; gpuflag = false,kw...)
+function setup_CH(ψ; gpuflag = false,dampcoeff=1.0,kw...)
     #Set up the simulation domain from the mask
     Nx, Ny = size(ψ) # grab size
     x = LinRange(0.0, 1, Nx) # x domain
@@ -11,7 +11,9 @@ function setup_CH(ψ; gpuflag = false,kw...)
     ∇2x = Tridiagonal([1.0 for i in 1:Nx-1],[-2.0 for i in 1:Nx],[1.0 for i in 1:Nx-1])
     ∇2x[1,2] = 2.0
     ∇2x[end,end-1] = 2.0
-    ∇2y= deepcopy(∇2x)
+    ∇2y = Tridiagonal([1.0 for i in 1:Ny-1],[-2.0 for i in 1:Ny],[1.0 for i in 1:Ny-1])
+    ∇2y[1,2] = 2.0
+    ∇2y[end,end-1] = 2.0
     ∇2y = ∇2y'
 
     #Set up d/dx stencils
@@ -32,8 +34,10 @@ function setup_CH(ψ; gpuflag = false,kw...)
     ∇y ./= 2*dy;
 
     #Precompute mask gradients
-    ∇ψ_x = ∇x*ψ; 
-    ∇ψ_y = ψ*∇y;
+    damp_factor = dampcoeff*norm(ψ);
+
+    ∇ψ_x = ∇x*ψ./damp_factor; 
+    ∇ψ_y = ψ*∇y./damp_factor;
 
     if ~gpuflag
         # Set up the caches
@@ -44,7 +48,7 @@ function setup_CH(ψ; gpuflag = false,kw...)
         ∇2μ=zeros(Nx,Ny); ∇2μ_c = DiffCache(∇2μ ;kw...)
         ∇μ_x=zeros(Nx,Ny); ∇μ_x_c = DiffCache(∇μ_x ;kw...)
         ∇μ_y=zeros(Nx,Ny); ∇μ_y_c = DiffCache(∇μ_y ;kw...)
-        return x,y,CHCacheFuncCPU(ψ,∇x,∇y,∇2x,∇2y,∇ψ_x,∇ψ_y,∇c_x_c,∇c_y_c,∇2c_c,μ_c,∇2μ_c,∇μ_x_c,∇μ_y_c)
+        return x,y,(du,u,p,t)->CHCacheFuncCPU(du,u,p,t,ψ,∇ψ_x,∇ψ_y,∇x,∇y,∇2x,∇2y,∇c_x_c,∇c_y_c,∇2c_c,μ_c,∇2μ_c,∇μ_x_c,∇μ_y_c)
     else
         # Convert everything to Float32 and send to the gpu
         ψ_g = CuArray(Float32.(ψ))
@@ -61,15 +65,23 @@ function setup_CH(ψ; gpuflag = false,kw...)
         ∇2μ_g = CuArray(Float32.(∇2μ))
         ∇μ_x_g = CuArray(Float32.(∇μ_x))
         ∇μ_y_g = CuArray(Float32.(∇μ_y))
-        return x,y,CHCacheFuncGPU(ψ_g,∇x_g,∇y_g,∇2x_g,∇2y_g,∇ψ_x_g,∇ψ_y_g,∇c_x_g,∇c_y_g,∇2c_g,μ_g,∇2μ_g,∇μ_x_g,∇μ_y_g)
+        return x,y,(du,u,p,t)->CHCacheFuncGPU(du,u,p,t,ψ_g,∇ψ_x_g,∇ψ_y_g,∇x_g,∇y_g,∇2x_g,∇2y_g,∇c_x_g,∇c_y_g,∇2c_g,μ_g,∇2μ_g,∇μ_x_g,∇μ_y_g)
     end
 
 end
+function genC0(Nx,Ny,ψ_b;noise_fac=0.05)
+    c0out = zeros(Nx,Ny)
+    for i=1:Nx,j=1:Ny
+        c0out[i,j]= ψ_b[i,j] ≈ 1.0 ? 0.5 + noise_fac*(2.0.*rand().-1.0) : 0.5 + 0.001*noise_fac*(2.0.*rand().-1.0);
+    end
+    return c0out;
+end
 ## ODE solver set up 
 function makesparseprob(rhsfunc,c0,tspan,p)
+    dc0=similar(c0);
     jac_sparsity = Symbolics.jacobian_sparsity((du, u) ->rhsfunc(du,u,p,0),dc0,c0);
     colorvec = matrix_colors(jac_sparsity);
-    f = ODEFunction(GCH_2D_mul!;jac_prototype=jac_sparsity,colorvec=colorvec);
+    f = ODEFunction(rhsfunc;jac_prototype=jac_sparsity,colorvec=colorvec);
     sparse_prob = ODEProblem(f,c0,tspan,p);
     return sparse_prob
 end
@@ -86,7 +98,11 @@ function heatgif(A::AbstractArray{<:Number,3}; kwargs...)
     return anim
 end
 function makegif(fullsol::CHsol; fpsv=10)
-    masksol = Array(fullsol.sol).*fullsol.ψ_binary;
-    anim = makegif(masksol)
+    masksol = Array(fullsol.sol.u).*fullsol.ψ_binary;
+    anim = makegif(Array(masksol))
     return gif(anim, fps = fpsv)
+end
+function plotlast(fullsol::CHsol;kw...)
+    tmp =Array((fullsol.sol).u[end]).*fullsol.ψ_binary
+    heatmap(tmp;kw...)
 end

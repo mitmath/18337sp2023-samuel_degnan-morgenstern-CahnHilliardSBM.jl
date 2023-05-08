@@ -21,8 +21,8 @@ function shape_smooth(du,u,p,t)
 end
 
 
-function makeMask(filename::String; imgthresh=0.1,tf = 0.1,filltol=1e-3,ζ=0.04)
-    ψ0 = makePngMask(filename,imgthresh)
+function makeMask(filename::String; imgthresh=0.1,tf = 0.1,filltol=1e-3,ζ=0.04,invflag=false)
+    ψ0 = makePngMask(filename,imgthresh;invert=invflag)
     Nx=size(ψ0,1)
     Ny=size(ψ0,2)
     x = LinRange(0.0,1,Nx)
@@ -36,7 +36,7 @@ function makeMask(filename::String; imgthresh=0.1,tf = 0.1,filltol=1e-3,ζ=0.04)
 
     ψ = sol.u[end];
 
-    ψ[ψ.<filltol] .= tol
+    ψ[ψ.<filltol] .= filltol
     ψ[ψ.>0.99] .= 1.0
 
     ψ_binary = copy(ψ)
@@ -64,4 +64,7 @@ function makePngMask(filename::String, threshold::Real = 0.5; invert = false)
         binary_array = .~binary_array
     end
     return Float64.(binary_array)
+end
+function loadfile(filename)
+    return readdlm(filename)
 end

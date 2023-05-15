@@ -1,4 +1,4 @@
-# CahnHilliardSim.jl <img align="right" src="https://github.com/stmorgenstern/CahnHilliardSBM.jl/blob/main/asset1.png?raw=true">
+# CahnHilliardSBM.jl <img align="right" src="https://github.com/stmorgenstern/CahnHilliardSBM.jl/blob/main/asset1.png?raw=true">
 
 This project was developed as part of the 18.337 class project.
 
@@ -12,9 +12,12 @@ The Cahn-Hilliard model is a powerful tool for simulating dynamics in lithium io
 - High-performance simulations of the Cahn-Hilliard phase field model
 - Support for GPU parallelization
 - Applications to PDE-constrained optimization
-- Future improvements and applications
 
 <img align="right" src="https://github.com/stmorgenstern/CahnHilliardSBM.jl/blob/main/philsimgif.gif?raw=true">
 
 ## Future Improvements and Applications
 This project lays the foundation for future studies on learning constitutive relationships in batteries at the population scale. We have planned several improvements and novel applications to further enhance the functionality and use-cases of the platform.
+
+## Authors
+- Samuel Degnan-Morgenstern stm16109@mit.edu
+- Bazant Group - MIT Dept. of Chemical Engineering

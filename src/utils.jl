@@ -99,7 +99,7 @@ function heatgif(A::AbstractArray{<:Number,3}; kwargs...)
 end
 function makegif(fullsol::CHsol; fpsv=10)
     masksol = Array(fullsol.sol.u).*fullsol.ψ_binary;
-    anim = makegif(Array(masksol))
+    anim = heatgif(Array(masksol))
     return gif(anim, fps = fpsv)
 end
 function plotlast(fullsol::CHsol;kw...)

@@ -15,6 +15,9 @@ The Cahn-Hilliard model is a powerful tool for simulating dynamics in lithium io
 
 <img align="right" src="https://github.com/stmorgenstern/CahnHilliardSBM.jl/blob/main/philsimgif.gif?raw=true">
 
+## Examples
+To see example usage of this model, please checkout the jupyter notebooks / julia files in the benchmark folder.
+
 ## Future Improvements and Applications
 This project lays the foundation for future studies on learning constitutive relationships in batteries at the population scale. We have planned several improvements and novel applications to further enhance the functionality and use-cases of the platform.
 

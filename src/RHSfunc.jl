@@ -1,5 +1,5 @@
 function CHCacheFuncCPU(du,u,p,t,ψ,∇x,∇y,∇2x,∇2y,∇ψ_x,∇ψ_y,∇c_x,∇c_y,∇2c,μ,∇2μ,∇μ_x,∇μ_y)
-    D, κ, Ω=p
+    D, κ, Ω =p
     c = @view u[:,:]
     dc = @view du[:,:]
     
@@ -20,6 +20,7 @@ function CHCacheFuncCPU(du,u,p,t,ψ,∇x,∇y,∇2x,∇2y,∇ψ_x,∇ψ_y,∇c_x
     mul!(∇2c_t,∇2x,c) # Compute (∇2c)ₓ = c*∇2x
     mul!(∇2c_t,c,∇2y,1.0,1.0) #∇2c = 1*(∇2c)ₓ + 1*(∇2y)*c
 
+    #Compute Chemical Potential
     @. μ_t = log(max(1e-10,c./(1.0 - c)))+ Ω*(1.0 - 2.0*c) .- κ*((∇c_x_t*∇ψ_x  + ∇c_y_t*∇ψ_y)./ψ + ∇2c_t);
 
     #Compute ∇2μ

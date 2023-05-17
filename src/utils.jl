@@ -34,8 +34,8 @@ function setup_CH(ψ; gpuflag = false,dampcoeff=1.0,kw...)
     ∇y ./= 2*dy;
 
     #Precompute mask gradients
-    #damp_factor = dampcoeff*norm(ψ);
-    damp_factor =1.0;
+    damp_factor = dampcoeff*norm(ψ);
+
     ∇ψ_x = ∇x*ψ./damp_factor; 
     ∇ψ_y = ψ*∇y./damp_factor;
 
@@ -98,11 +98,8 @@ function heatgif(A::AbstractArray{<:Number,3}; kwargs...)
     return anim
 end
 function makegif(fullsol::CHsol; fpsv=10)
-    masksol = Array{Float64}(undef,size(fullsol.sol))
-    for i=1:size(masksol,3)
-        masksol[:,:,i] .= (fullsol.sol.u[i]).*fullsol.ψ_binary
-    end
-    anim = heatgif(masksol)
+    masksol = Array(fullsol.sol.u).*fullsol.ψ_binary;
+    anim = heatgif(Array(masksol))
     return gif(anim, fps = fpsv)
 end
 function plotlast(fullsol::CHsol;kw...)

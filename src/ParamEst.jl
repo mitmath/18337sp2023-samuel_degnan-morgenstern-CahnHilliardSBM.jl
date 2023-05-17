@@ -34,7 +34,7 @@ function solve_pe(pinit,loss;iter_max=200)
 end
 
 
-function run_pe(ψ,ψ_binary,c0_messy,pinit,ptruth;tspan=(0.0,1.0),Nsteps=100,itmax=200)
+function run_pe(ψ,ψ_binary,c0_messy,ptruth;tspan=(0.0,1.0),Nsteps=100,itmax=200)
     tsteps,ode_data,prob=set_pe(ψ,c0_messy,ptruth,tspan,Nsteps)
     loss(θ) = proto_loss(θ,prob,tsteps,ode_data,ψ_binary)
     optsol=solve_pe(pinit,loss;iter_max=itmax)
